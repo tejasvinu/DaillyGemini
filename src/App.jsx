@@ -1,49 +1,140 @@
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useEffect } from 'react';
+import Header from './components/Header';
+import NotesWidget from './components/NotesWidget';
+import CalendarEvents from './components/CalendarEvents';
+import MediaPlayer from './components/MediaPlayer';
+import Navbar from './components/Navbar';
+import Login from './components/Login';
+import Register from './components/Register';
+import PrivateRoute from './components/PrivateRoute';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import { notesService } from './services/notesService';
 
 function App() {
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [notes, setNotes] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [newNote, setNewNote] = useState('');
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  useEffect(() => {
+    fetchNotes();
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const fetchNotes = async () => {
+    try {
+      setIsLoading(true);
+      const fetchedNotes = await notesService.getAllNotes();
+      setNotes(fetchedNotes);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleAddNote = async (e) => {
+    e.preventDefault();
+    if (newNote.trim()) {
+      try {
+        setIsLoading(true);
+        const savedNote = await notesService.addNote(newNote.trim());
+        setNotes([...notes, savedNote]);
+        setNewNote('');
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  };
+
+  const handleDeleteNote = async (id) => {
+    try {
+      setIsLoading(true);
+      await notesService.deleteNote(id);
+      setNotes(notes.filter(note => note._id !== id));
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const mockEvents = [
+    { title: 'Daily Standup', time: '10:00 AM' },
+    { title: 'Client Meeting', time: '2:00 PM' },
+    { title: 'Code Review', time: '4:00 PM' },
+  ];
+
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="flex justify-center space-x-8 mb-8">
-        <a href="https://vitejs.dev" target="_blank" className="hover:opacity-80">
-          <img src={viteLogo} className="h-16" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank" className="hover:opacity-80">
-          <img src={reactLogo} className="h-16" alt="React logo" />
-        </a>
-      </div>
-      
-      <div className="max-w-3xl mx-auto text-center">
-        <h1 className="text-4xl font-bold text-gray-900 mb-8">
-          React + Vite + Tailwind Template
-        </h1>
-        
-        <div className="bg-white shadow rounded-lg p-6 mb-8">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-4">Quick Start</h2>
-          <div className="text-left space-y-4 text-gray-600">
-            <p>1. Clone this repository</p>
-            <p>2. Install dependencies: <code className="bg-gray-100 px-2 py-1 rounded">npm install</code></p>
-            <p>3. Start development server: <code className="bg-gray-100 px-2 py-1 rounded">npm run dev</code></p>
+    <AuthProvider>
+      <Router>
+        <div className="min-h-screen bg-gradient-to-br from-purple-200 via-pink-100 to-blue-200 p-8 transition-all duration-500">
+          <div className="max-w-8xl mx-auto space-y-8">
+            {/* Navbar with glass effect */}
+            <div className="backdrop-blur-sm bg-white/30 rounded-xl shadow-lg mb-8">
+              <Navbar />
+            </div>
+
+            <Routes>
+              <Route path="/login" element={
+                <div className="backdrop-blur-sm bg-white/40 rounded-xl p-8 shadow-lg max-w-md mx-auto">
+                  <Login />
+                </div>
+              } />
+              <Route path="/register" element={
+                <div className="backdrop-blur-sm bg-white/40 rounded-xl p-8 shadow-lg max-w-md mx-auto">
+                  <Register />
+                </div>
+              } />
+              
+              <Route
+                path="/"
+                element={
+                  <PrivateRoute>
+                    <div className="space-y-8">
+                      <div className="backdrop-blur-sm bg-white/30 rounded-xl p-6 shadow-lg">
+                        <Header currentTime={currentTime} />
+                      </div>
+
+                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div className="backdrop-blur-sm bg-white/40 rounded-xl p-6 shadow-lg transition-transform hover:scale-[1.02]">
+                          <NotesWidget 
+                            notes={notes} 
+                            newNote={newNote} 
+                            setNewNote={setNewNote} 
+                            handleAddNote={handleAddNote} 
+                            handleDeleteNote={handleDeleteNote}
+                            isLoading={isLoading}
+                            error={error}
+                          />
+                        </div>
+                        
+                        <div className="backdrop-blur-sm bg-white/40 rounded-xl p-6 shadow-lg transition-transform hover:scale-[1.02]">
+                          <CalendarEvents mockEvents={mockEvents} />
+                        </div>
+                        
+                        <div className="backdrop-blur-sm bg-white/40 rounded-xl p-6 shadow-lg transition-transform hover:scale-[1.02]">
+                          <MediaPlayer isPlaying={isPlaying} setIsPlaying={setIsPlaying} />
+                        </div>
+                      </div>
+                    </div>
+                  </PrivateRoute>
+                }
+              />
+            </Routes>
           </div>
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <a href="https://tailwindcss.com" target="_blank" 
-             className="block p-6 bg-white shadow rounded-lg hover:shadow-md transition-shadow">
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">Tailwind CSS Docs</h3>
-            <p className="text-gray-600">Learn about the utility-first CSS framework</p>
-          </a>
-          
-          <a href="https://react.dev" target="_blank"
-             className="block p-6 bg-white shadow rounded-lg hover:shadow-md transition-shadow">
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">React Docs</h3>
-            <p className="text-gray-600">Explore React components and hooks</p>
-          </a>
-        </div>
-      </div>
-    </div>
-  )
+      </Router>
+    </AuthProvider>
+  );
 }
 
-export default App
+export default App;
