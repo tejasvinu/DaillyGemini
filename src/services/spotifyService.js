@@ -1,16 +1,9 @@
-import { spotifyAuth } from './spotifyAuthService';
+import axios from 'axios';
 
 export const getCurrentPlayback = async () => {
   try {
-    const token = await spotifyAuth.getAccessToken();
-    console.log(token);
-    const response = await fetch('https://api.spotify.com/v1/me/player', {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-    if (!response.ok) return null;
-    return await response.json();
+    const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/spotify/player`);
+    return response.data;
   } catch (error) {
     console.error('Error fetching playback:', error);
     return null;
@@ -19,13 +12,7 @@ export const getCurrentPlayback = async () => {
 
 export const controlPlayback = async (action) => {
   try {
-    const token = await spotifyAuth.getAccessToken();
-    await fetch(`https://api.spotify.com/v1/me/player/${action}`, {
-      method: 'PUT',
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
+    await axios.put(`${process.env.REACT_APP_BACKEND_URL}/spotify/player/${action}`);
   } catch (error) {
     console.error('Error controlling playback:', error);
   }

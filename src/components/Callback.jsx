@@ -5,42 +5,28 @@ import { spotifyAuth } from '../services/spotifyAuthService';
 function Callback() {
   const navigate = useNavigate();
   const [error, setError] = useState(null);
+  const [handled, setHandled] = useState(false); // Add a state to prevent multiple handling
 
   useEffect(() => {
     const handleCallback = async () => {
       try {
-        const urlParams = new URLSearchParams(window.location.search);
-        const code = urlParams.get('code');
-        const state = urlParams.get('state');
-        const spotifyError = urlParams.get('error');
-
-        if (spotifyError) {
-          throw new Error(`Spotify auth error: ${spotifyError}`);
-        }
-
-        if (!code || !state) {
-          throw new Error('Missing required auth parameters');
-        }
-
-        if (!sessionStorage.getItem('spotify_auth_state')) {
-          throw new Error('No stored auth state found');
-        }
-
-        const success = await spotifyAuth.handleCallback(code, state);
-        if (success) {
+        const data = await spotifyAuth.handleCallback();
+        if (data.success) {
+          setHandled(true);
           navigate('/', { replace: true });
-          return;
+        } else {
+          throw new Error('Authentication failed');
         }
-        throw new Error('Authentication failed');
       } catch (error) {
         console.error('Authentication error:', error);
         setError(error.message);
+        setHandled(true);
         setTimeout(() => navigate('/', { replace: true }), 3000);
       }
     };
 
     handleCallback();
-  }, [navigate]);
+  }, [navigate, handled]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
