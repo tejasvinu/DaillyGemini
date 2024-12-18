@@ -11,9 +11,21 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="navbar bg-white shadow p-4 flex justify-between items-center">
+    <nav
+      className="navbar p-4 flex justify-between items-center"
+      style={{
+        background: 'linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet)',
+        backgroundSize: '600% 600%',
+        animation: 'gradientAnimation 16s ease infinite',
+      }}
+    >
       <div className="logo">
-        <Link to="/">DailyGemini</Link>
+        <Link
+          to="/"
+          className="text-white text-4xl font-extrabold transform hover:rotate-360 transition duration-1000"
+        >
+          DailyGemini
+        </Link>
       </div>
       <div className="flex items-center">
         {token ? (
@@ -22,13 +34,17 @@ const Navbar = () => {
               className="flex items-center cursor-pointer"
               onClick={() => setShowDropdown(!showDropdown)}
             >
-              <div className="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center mr-3">
+              <div
+                className="w-10 h-10 rounded-full bg-pink-500 text-white flex items-center justify-center mr-3 transform hover:rotate-180 transition duration-500"
+              >
                 {getInitials(user?.username)}
               </div>
-              <span className="mr-4">{user?.username || user?.email}</span>
+              <span className="mr-4 text-white font-bold animate-pulse">
+                {user?.username || user?.email}
+              </span>
             </div>
             {showDropdown && (
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1">
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 animate-bounce">
                 <div className="px-4 py-2 text-sm text-gray-700">
                   {user?.email}
                 </div>
@@ -43,8 +59,18 @@ const Navbar = () => {
           </div>
         ) : (
           <>
-            <Link to="/login" className="mr-4">Login</Link>
-            <Link to="/register">Register</Link>
+            <Link
+              to="/login"
+              className="mr-4 text-white font-bold transform hover:skew-y-12 transition duration-500"
+            >
+              Login
+            </Link>
+            <Link
+              to="/register"
+              className="text-white font-bold transform hover:-skew-y-12 transition duration-500"
+            >
+              Register
+            </Link>
           </>
         )}
       </div>

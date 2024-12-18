@@ -1,53 +1,137 @@
-import React, { useEffect, useState } from 'react';
-import { FiHeart, FiVolume2 } from 'react-icons/fi';
-import { BsPlayFill, BsPauseFill, BsSkipForward, BsSkipBackward, BsShuffle, BsRepeat } from 'react-icons/bs';
-import { getCurrentPlayback, controlPlayback } from '../services/spotifyService';
+import React, { useState, useEffect, useRef } from 'react';
+import { getCurrentPlayback, controlPlayback, setVolume } from '../services/spotifyService';
 import { spotifyAuth } from '../services/spotifyAuthService';
 import LoginButton from './LoginButton';
+import { FiPlay, FiPause, FiSkipForward, FiSkipBack, FiVolume2, FiHeart } from 'react-icons/fi';
+
+const defaultTrackImage = 'https://via.placeholder.com/88';
 
 function MediaPlayer() {
   const [playbackState, setPlaybackState] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [currentTime, setCurrentTime] = useState('0:00');
+  const [isHovering, setIsHovering] = useState(false);
+  const [hoverTime, setHoverTime] = useState('0:00');
+  const timelineRef = useRef(null);
+  const playheadRef = useRef(null);
+  const hoverPlayheadRef = useRef(null);
+
+  const formatTime = (timeInSeconds) => {
+    if (isNaN(timeInSeconds) || timeInSeconds === Infinity) return '0:00';
+    const minutes = Math.floor(timeInSeconds / 60);
+    let seconds = Math.floor(timeInSeconds % 60);
+    seconds = seconds >= 10 ? seconds : `0${seconds}`;
+    return `${minutes}:${seconds}`;
+  };
 
   useEffect(() => {
-    // Check authentication status
     const checkAuth = () => {
-      setIsAuthenticated(spotifyAuth.isAuthenticated());
+      const auth = spotifyAuth.isAuthenticated();
+      setIsAuthenticated(auth);
     };
 
     checkAuth();
-    // Recheck auth status every few seconds in case of changes
     const authCheck = setInterval(checkAuth, 3000);
+
     const fetchPlaybackState = async () => {
       if (isAuthenticated) {
-        const state = await getCurrentPlayback();
-        setPlaybackState(state);
+        try {
+          const state = await getCurrentPlayback();
+          setPlaybackState(state);
+          const newCurrentTime = formatTime(state?.progress_ms / 1000);
+          setCurrentTime(newCurrentTime);
+        } catch (error) {
+          console.error('Failed to fetch playback state:', error);
+          setPlaybackState(null);
+        }
       }
     };
 
     if (isAuthenticated) {
       fetchPlaybackState();
       const playbackCheck = setInterval(fetchPlaybackState, 1000);
+
       return () => {
         clearInterval(authCheck);
         clearInterval(playbackCheck);
       };
     }
-    console.log(isAuthenticated);
     return () => clearInterval(authCheck);
   }, [isAuthenticated]);
 
+  useEffect(() => {
+    if (playbackState) {
+      const progressPercent = (playbackState.progress_ms / playbackState.item.duration_ms) * 100;
+      if (playheadRef.current) {
+        playheadRef.current.style.width = `${progressPercent}%`;
+      }
+      setCurrentTime(formatTime(playbackState.progress_ms / 1000));
+    }
+  }, [playbackState]);
+
+  const handleTimeLineClick = (e) => {
+    if (playbackState && timelineRef.current) {
+      const duration = playbackState.item.duration_ms / 1000;
+      const timelineWidth = timelineRef.current.offsetWidth;
+      const offsetWidth = timelineRef.current.getBoundingClientRect().left;
+      const clickWidth = e.clientX - offsetWidth;
+      const clickPercentage = (clickWidth / timelineWidth) * 100;
+
+      const seekPosition = (duration * clickPercentage) / 100;
+      controlPlayback('seek', seekPosition * 1000);
+    }
+  };
+
+  const handleHoverTimeLine = (e) => {
+    if (playbackState && timelineRef.current) {
+      const duration = playbackState.item.duration_ms / 1000;
+      const timelineWidth = timelineRef.current.offsetWidth;
+      const offsetWidth = timelineRef.current.getBoundingClientRect().left;
+      const hoverWidth = e.clientX - offsetWidth;
+      const hoverPercentage = (hoverWidth / timelineWidth) * 100;
+
+      if (hoverPercentage <= 100) {
+        hoverPlayheadRef.current.style.width = `${hoverPercentage}%`;
+      }
+
+      const time = (duration * hoverPercentage) / 100;
+
+      if (time >= 0 && time <= duration) {
+        setHoverTime(formatTime(time));
+      }
+    }
+    setIsHovering(true);
+  };
+
+  const handleMouseOut = () => {
+    if (hoverPlayheadRef.current) {
+      hoverPlayheadRef.current.style.width = '0';
+    }
+    setIsHovering(false);
+  };
+
   const handlePlayPause = () => {
-    controlPlayback(playbackState?.is_playing ? 'pause' : 'play');
+    if (playbackState?.item) {
+      controlPlayback(playbackState?.is_playing ? 'pause' : 'play');
+    }
   };
 
   const handleSkip = (direction) => {
-    controlPlayback(direction === 'next' ? 'next' : 'previous');
+    if (playbackState?.item) {
+      controlPlayback(direction === 'next' ? 'next' : 'previous');
+    }
+  };
+
+  const handleVolumeChange = (e) => {
+    const newVolume = parseInt(e.target.value, 10);
+    if (playbackState?.device) {
+      setVolume(newVolume);
+    }
   };
 
   if (!isAuthenticated) {
     return (
-      <div className="fixed bottom-0 left-0 right-0 bg-[#282828] p-4 flex justify-center">
+      <div className="fixed bottom-8 right-8">
         <LoginButton />
       </div>
     );
@@ -56,86 +140,56 @@ function MediaPlayer() {
   if (!playbackState) return null;
 
   return (
-    <div className="bg-[#282828] text-white p-4 fixed bottom-0 left-0 right-0">
-      <div className="max-w-screen-xl mx-auto flex items-center justify-between">
-        {/* Track Info */}
-        <div className="flex items-center w-1/4">
-          <img 
-            src={playbackState?.item?.album?.images[0]?.url} 
-            alt="Album Cover" 
-            className="w-14 h-14 rounded"
-          />
-          <div className="ml-3">
-            <p className="text-sm font-medium">{playbackState?.item?.name}</p>
-            <p className="text-xs text-gray-400">
-              {playbackState?.item?.artists?.map(a => a.name).join(', ')}
-            </p>
-          </div>
-          <button className="ml-4 text-gray-400 hover:text-white">
-            <FiHeart />
+    <div className="bg-white rounded-lg drop-shadow p-4 dark:bg-black dark:shadow-white">
+      <div className="flex flex-col justify-center items-center">
+        <img
+          className="rounded-lg aspect-square w-64"
+          src={playbackState?.item?.album?.images[0]?.url || defaultTrackImage}
+          alt="album cover"
+        />
+        <p className="mt-2 font-semibold text-md text-gray-600 dark:text-gray-300">
+          {playbackState?.item?.name}
+        </p>
+        <p className="font-semibold text-xs text-gray-600 dark:text-gray-300">
+          {playbackState?.item?.artists?.map(a => a.name).join(', ')}
+        </p>
+      </div>
+      <div className="flex flex-col justify-center items-center my-4">
+        <input
+          type="range"
+          value={playbackState?.progress_ms / playbackState?.item?.duration_ms * 100 || 0}
+          onChange={(e) => {
+            const seekPosition = parseInt(e.target.value, 10);
+            controlPlayback('seek', (seekPosition / 100) * playbackState.item.duration_ms);
+          }}
+          className="rounded-lg overflow-hidden appearance-none bg-gray-200 h-1 w-full dark:bg-gray-700"
+        />
+        <div className="flex justify-between w-3/5 items-center my-2">
+          <button
+            onClick={() => handleSkip('previous')}
+            className="aspect-square bg-white flex justify-center items-center rounded-full p-2 shadow-lg dark:bg-gray-800"
+            aria-label="Previous"
+          >
+            <FiSkipBack size={20} color="#816cfa" />
           </button>
-        </div>
-
-        {/* Player Controls */}
-        <div className="flex flex-col items-center w-2/4">
-          <div className="flex items-center gap-4 mb-2">
-            <button className={`text-gray-400 hover:text-white ${playbackState?.shuffle_state ? 'text-green-500' : ''}`}>
-              <BsShuffle className="text-sm" />
-            </button>
-            <button 
-              className="text-gray-400 hover:text-white"
-              onClick={() => handleSkip('previous')}
-            >
-              <BsSkipBackward className="text-lg" />
-            </button>
-            <button
-              className="p-2 bg-white text-black rounded-full hover:scale-105"
-              onClick={handlePlayPause}
-            >
-              {playbackState?.is_playing ? 
-                <BsPauseFill className="text-xl" /> : 
-                <BsPlayFill className="text-xl ml-0.5" />
-              }
-            </button>
-            <button 
-              className="text-gray-400 hover:text-white"
-              onClick={() => handleSkip('next')}
-            >
-              <BsSkipForward className="text-lg" />
-            </button>
-            <button className={`text-gray-400 hover:text-white ${playbackState?.repeat_state !== 'off' ? 'text-green-500' : ''}`}>
-              <BsRepeat className="text-sm" />
-            </button>
-          </div>
-          
-          {/* Progress Bar */}
-          <div className="w-full flex items-center gap-2 text-xs">
-            <span className="text-gray-400">
-              {Math.floor(playbackState?.progress_ms / 1000 / 60)}:
-              {String(Math.floor((playbackState?.progress_ms / 1000) % 60)).padStart(2, '0')}
-            </span>
-            <div className="h-1 flex-grow rounded-full bg-gray-600">
-              <div 
-                className="h-1 rounded-full bg-gray-200 hover:bg-green-500"
-                style={{ width: `${(playbackState?.progress_ms / playbackState?.item?.duration_ms) * 100}%` }}
-              />
-            </div>
-            <span className="text-gray-400">
-              {Math.floor(playbackState?.item?.duration_ms / 1000 / 60)}:
-              {String(Math.floor((playbackState?.item?.duration_ms / 1000) % 60)).padStart(2, '0')}
-            </span>
-          </div>
-        </div>
-
-        {/* Volume Control */}
-        <div className="flex items-center justify-end w-1/4">
-          <FiVolume2 className="text-gray-400" />
-          <div className="w-24 h-1 ml-2 rounded-full bg-gray-600">
-            <div 
-              className="h-1 rounded-full bg-gray-200 hover:bg-green-500"
-              style={{ width: `${playbackState?.device?.volume_percent}%` }}
-            />
-          </div>
+          <button
+            onClick={handlePlayPause}
+            className="aspect-square bg-white flex justify-center items-center rounded-full p-2 shadow-lg dark:bg-gray-800"
+            aria-label={playbackState?.is_playing ? 'Pause' : 'Play'}
+          >
+            {playbackState?.is_playing ? (
+              <FiPause size={20} color="#816cfa" />
+            ) : (
+              <FiPlay size={20} color="#816cfa" />
+            )}
+          </button>
+          <button
+            onClick={() => handleSkip('next')}
+            className="aspect-square bg-white flex justify-center items-center rounded-full p-2 shadow-lg dark:bg-gray-800"
+            aria-label="Next"
+          >
+            <FiSkipForward size={20} color="#816cfa" />
+          </button>
         </div>
       </div>
     </div>

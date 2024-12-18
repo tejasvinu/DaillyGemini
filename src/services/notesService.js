@@ -16,6 +16,7 @@ export const notesService = {
     const response = await api.get('/api/notes', {
       headers: getAuthHeaders()
     });
+    console.log(response.data);
     return response.data;
   },
 

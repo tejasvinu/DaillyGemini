@@ -33,6 +33,7 @@ function App() {
       setIsLoading(true);
       const fetchedNotes = await notesService.getAllNotes();
       setNotes(fetchedNotes);
+      console.log(fetchedNotes);
     } catch (err) {
       setError(err.message);
     } finally {

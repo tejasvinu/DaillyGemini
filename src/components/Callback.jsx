@@ -13,6 +13,7 @@ function Callback() {
         const data = await spotifyAuth.handleCallback();
         if (data.success) {
           setHandled(true);
+          window.history.replaceState(null, null, ' '); // Remove hash from URL
           navigate('/', { replace: true });
         } else {
           throw new Error('Authentication failed');
@@ -21,11 +22,16 @@ function Callback() {
         console.error('Authentication error:', error);
         setError(error.message);
         setHandled(true);
-        setTimeout(() => navigate('/', { replace: true }), 3000);
+        setTimeout(() => {
+          window.history.replaceState(null, null, ' '); // Remove hash from URL
+          navigate('/', { replace: true });
+        }, 3000);
       }
     };
 
-    handleCallback();
+    if (!handled) {
+      handleCallback();
+    }
   }, [navigate, handled]);
 
   return (
