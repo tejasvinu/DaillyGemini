@@ -10,6 +10,7 @@ import PrivateRoute from './components/PrivateRoute';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { notesService } from './services/notesService';
+import Callback from './components/Callback';
 
 function App() {
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -84,6 +85,7 @@ function App() {
             </div>
 
             <Routes>
+              <Route path="/callback" element={<Callback />} />
               <Route path="/login" element={
                 <div className="backdrop-blur-sm bg-white/40 rounded-xl p-8 shadow-lg max-w-md mx-auto">
                   <Login />
