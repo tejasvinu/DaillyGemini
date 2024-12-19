@@ -1,8 +1,9 @@
 import axios from 'axios';
 
 const CLIENT_ID = '2715c4e17c53497d855d34db2122c513';
-const REDIRECT_URI = 'http://localhost:5173/callback';
-const SCOPES = [
+const REDIRECT_URI = 'https://dailly-gemini.vercel.app/callback';
+//const REDIRECT_URI = 'http://localhost:5173/callback';
+const SCOPES = 
     'user-top-read',
     'user-read-private',
     'user-read-email',
