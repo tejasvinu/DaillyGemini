@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000';
+const API_URL = 'https://dailyy-gemini-backend.vercel.app';
 
 const api = axios.create({
   baseURL: API_URL,
