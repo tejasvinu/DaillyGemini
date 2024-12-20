@@ -1,9 +1,8 @@
 import axios from 'axios';
 
-const CLIENT_ID = '2715c4e17c53497d855d34db2122c513';
-const REDIRECT_URI = 'https://dailly-gemini.vercel.app/callback';
-//const REDIRECT_URI = 'http://localhost:5173/callback';
-const SCOPES = 
+const CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
+const REDIRECT_URI = import.meta.env.VITE_REDIRECT_URI;
+const SCOPES = [
     'user-top-read',
     'user-read-private',
     'user-read-email',
@@ -44,7 +43,7 @@ class SpotifyAuthManager {
 
   logout() {
     // Call backend logout endpoint
-    window.location.href = `${process.env.REACT_APP_BACKEND_URL}/auth/logout`;
+    window.location.href = `${import.meta.env.VITE_BACKEND_URL}/auth/logout`;
   }
 }
 
