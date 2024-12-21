@@ -136,14 +136,16 @@ function Header({ currentTime }) {
             </div>
             {/* Daily Forecast */}
             {weatherData?.daily && (
-              <div className="mt-10 md:mt-12 space-y-4 flex justify-center">
+              <div className="mt-10 md:mt-12 flex flex-col items-center space-y-4">
                 <h2 className="text-2xl md:text-3xl font-semibold flex items-center justify-center">
                   <FiCalendar className="text-yellow-300 mr-2" />
                   Daily Forecast
                 </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-center">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                   <div className="bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg p-4 rounded-2xl shadow-lg border border-opacity-50 border-gray-300">
-                    <p className="text-xl md:text-2xl font-bold">Max: {weatherData.daily.temperature_2m_max[0]}°C</p>
+                    <p className="text-xl md:text-2xl font-bold">
+                      Max: {weatherData.daily.temperature_2m_max[0]}°C
+                    </p>
                     <p className="text-xl">Min: {weatherData.daily.temperature_2m_min[0]}°C</p>
                     <p className="text-xl">UV Index: {weatherData.daily.uv_index_max[0]}</p>
                   </div>
