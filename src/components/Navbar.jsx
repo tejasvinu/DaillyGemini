@@ -1,78 +1,77 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { MdKeyboardArrowDown } from 'react-icons/md';
 import { useAuth } from '../context/AuthContext';
 
 const Navbar = () => {
   const { token, user, clearAuth } = useAuth();
   const [showDropdown, setShowDropdown] = useState(false);
-
+  
   const getInitials = (name) => {
-    return name ? name.charAt(0).toUpperCase() : '?';
+    return name ? name.split(' ').map(n => n[0]).join('').toUpperCase() : '?';
   };
 
   return (
-    <nav
-      className="navbar p-4 flex justify-between items-center"
-      style={{
-        background: 'linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet)',
-        backgroundSize: '600% 600%',
-        animation: 'gradientAnimation 16s ease infinite',
-      }}
-    >
-      <div className="logo">
-        <Link
-          to="/"
-          className="text-white text-4xl font-extrabold transform hover:rotate-360 transition duration-1000"
-        >
-          DailyGemini
-        </Link>
-      </div>
-      <div className="flex items-center">
-        {token ? (
-          <div className="relative">
-            <div
-              className="flex items-center cursor-pointer"
-              onClick={() => setShowDropdown(!showDropdown)}
-            >
-              <div
-                className="w-10 h-10 rounded-full bg-pink-500 text-white flex items-center justify-center mr-3 transform hover:rotate-180 transition duration-500"
+    <nav className="fixed top-0 left-0 right-0 bg-white/5 backdrop-blur-lg border-b border-white/10 z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-14 md:h-16">
+          <Link to="/" className="flex items-center space-x-2">
+            <span className="text-2xl font-light tracking-wider text-white">
+              Daily<span className="font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Gemini</span>
+            </span>
+          </Link>
+
+          {token ? (
+            <div className="relative">
+              <button
+                className="group flex items-center space-x-3 py-2 px-4 rounded-full transition-all duration-300 hover:bg-white/10"
+                onClick={() => setShowDropdown(!showDropdown)}
               >
-                {getInitials(user?.username)}
-              </div>
-              <span className="mr-4 text-white font-bold animate-pulse">
-                {user?.username || user?.email}
-              </span>
-            </div>
-            {showDropdown && (
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 animate-bounce">
-                <div className="px-4 py-2 text-sm text-gray-700">
-                  {user?.email}
+                <div className="relative">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-400 to-pink-400 flex items-center justify-center text-white font-medium transition-transform duration-300 group-hover:scale-105">
+                    {getInitials(user?.username)}
+                  </div>
+                  <div className="absolute inset-0 w-10 h-10 rounded-full bg-gradient-to-r from-purple-400 to-pink-400 blur-lg opacity-30 group-hover:opacity-50 transition-opacity duration-300"></div>
                 </div>
-                <button
-                  onClick={clearAuth}
-                  className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
-                >
-                  Logout
-                </button>
-              </div>
-            )}
-          </div>
-        ) : (
-          <>
-            <Link
-              to="/login"
-              className="mr-4 text-white font-bold transform hover:skew-y-12 transition duration-500"
-            >
-              Login
-            </Link>
-            <Link
-              to="/register"
-              className="text-white font-bold transform hover:-skew-y-12 transition duration-500"
-            >
-              Register
-            </Link>
-          </>
-        )}
+                <span className="text-white/90 font-light hidden md:block">
+                  {user?.username}
+                </span>
+                <MdKeyboardArrowDown 
+                  className="w-4 h-4 text-white/70 transition-transform duration-300 group-hover:text-white"
+                  style={{ transform: showDropdown ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                />
+              </button>
+
+              {showDropdown && (
+                <div className="absolute right-0 mt-2 w-64 origin-top-right rounded-lg bg-white/10 backdrop-blur-lg border border-white/10 shadow-lg transition-all duration-300">
+                  <div className="p-2 space-y-1">
+                    <div className="px-3 py-2 rounded-md text-sm text-white/70">
+                      {user?.email}
+                    </div>
+                    <button
+                      onClick={() => {
+                        clearAuth();
+                        setShowDropdown(false);
+                      }}
+                      className="w-full text-left px-3 py-2 text-sm text-white/90 hover:bg-white/10 rounded-md transition-colors duration-200"
+                    >
+                      Sign out
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="space-x-2">
+              <Link to="/login" className="px-4 py-2 text-sm text-white/90 hover:text-white transition-colors duration-200">
+                Sign in
+              </Link>
+              <Link to="/register" className="px-4 py-2 text-sm text-white bg-white/10 rounded-full hover:bg-white/20 transition-colors duration-200">
+                Sign up
+              </Link>
+            </div>
+          )}
+        </div>
       </div>
     </nav>
   );

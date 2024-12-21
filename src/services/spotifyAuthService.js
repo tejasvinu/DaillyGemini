@@ -1,5 +1,3 @@
-import axios from 'axios';
-
 const CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
 const REDIRECT_URI = import.meta.env.VITE_REDIRECT_URI;
 const SCOPES = [
@@ -7,7 +5,8 @@ const SCOPES = [
     'user-read-private',
     'user-read-email',
     'user-read-playback-state',        // Added scope
-    'user-modify-playback-state'       // Added scope
+    'user-modify-playback-state',      // Added scope
+    'streaming'                        // Added scope
 ];
 
 class SpotifyAuthManager {
@@ -73,6 +72,10 @@ export async function fetchWebApi(endpoint, method, body) {
     if (res.status === 401) {
       clearTokens();
       return { success: false };
+    }
+    
+    if (res.status === 204) {
+      return {};
     }
     
     if (!res.ok) {

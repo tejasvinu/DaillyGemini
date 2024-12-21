@@ -26,3 +26,48 @@ export const setVolume = async (volumePercent) => {
     console.error('Error setting volume:', error);
   }
 };
+
+export const transferPlayback = async (deviceId, shouldPlay) => {
+  try {
+    await fetchWebApi('me/player', 'PUT', {
+      device_ids: [deviceId],
+      play: shouldPlay // Ensure this is true to start playback
+    });
+  } catch (error) {
+    console.error('Error transferring playback:', error);
+  }
+};
+
+export const getUserPlaylists = async () => {
+  try {
+    const response = await fetchWebApi('me/playlists?limit=10', 'GET');
+    return response?.items || [];
+  } catch (error) {
+    console.error('Error fetching user playlists:', error);
+    return [];
+  }
+};
+
+export const startPlayback = async (contextUri) => {
+  try {
+    await fetchWebApi('me/player/play', 'PUT', {
+      context_uri: contextUri,
+      offset: { position: 0 },
+      position_ms: 0
+    });
+  } catch (error) {
+    console.error('Error starting playback:', error);
+  }
+};
+
+export const getRandomPlaylist = async () => {
+  try {
+    const playlists = await getUserPlaylists();
+    if (playlists.length === 0) return null;
+    const randomIndex = Math.floor(Math.random() * playlists.length);
+    return playlists[randomIndex];
+  } catch (error) {
+    console.error('Error fetching random playlist:', error);
+    return null;
+  }
+};
