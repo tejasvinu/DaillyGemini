@@ -74,6 +74,10 @@ export async function fetchWebApi(endpoint, method, body) {
       return { success: false };
     }
     
+    if (res.status === 0) {
+      throw new Error('Request was blocked by the client.');
+    }
+    
     if (res.status === 204) {
       return {};
     }
@@ -85,6 +89,10 @@ export async function fetchWebApi(endpoint, method, body) {
     return await res.json();
   } catch (error) {
     console.error('API call error:', error);
+    if (error.message === 'Request was blocked by the client.') {
+      console.error('API call was blocked by the client:', error);
+      throw error;
+    }
     throw error;
   }
 }
