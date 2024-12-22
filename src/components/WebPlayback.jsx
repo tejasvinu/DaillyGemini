@@ -178,7 +178,7 @@ function WebPlayback({ token }) {
     );
   } else {
     return (
-      <div className="bg-white/10 rounded-xl p-6 shadow-lg">
+      <div className="bg-gradient-to-bl from-black to-purple-900 rounded-xl p-6 shadow-2xl">
         <div className="flex flex-col space-y-4">
           {/* Album Art and Track Info */}
           <div className="flex items-center space-x-4">
@@ -234,7 +234,7 @@ function WebPlayback({ token }) {
 
               <button
                 onClick={() => player?.togglePlay()}
-                className="p-3 rounded-full bg-white text-black hover:scale-105 transition"
+                className="p-3 rounded-full bg-white text-black hover:scale-105 transition-transform shadow-lg"
               >
                 {is_paused ? <FaPlay className="w-6 h-6" /> : <FaPause className="w-6 h-6" />}
               </button>

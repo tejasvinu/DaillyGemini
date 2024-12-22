@@ -11,7 +11,7 @@ function CalendarEvents({ mockEvents }) {
       </h2>
       <ul className="space-y-3">
         {mockEvents.map((event, index) => (
-          <li key={index} className="bg-gray-700 p-3 rounded-lg flex items-center justify-between">
+          <li key={index} className="bg-gray-600 p-3 rounded-lg flex items-center justify-between hover:ring-2 ring-gray-400 transition">
             <span className="font-medium">{event.title}</span>
             <span className="text-sm text-gray-300">{event.time}</span>
           </li>

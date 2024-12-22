@@ -1,167 +1,167 @@
-//components/Header.js
 import React, { useEffect, useState } from 'react';
-import {
-  FiSun,
-  FiMapPin,
-  FiThermometer,
-  FiDroplet,
-  FiClock,
-  FiCalendar,
-  FiSunrise,
-  FiSunset,
-  FiWind,
-  FiCloudRain,
+import { 
+  WiDaySunny,
+  WiRain,
+  WiSnow,
+  WiThunderstorm,
+  WiFog,
+  WiCloudy,
+  WiThermometer,
+  WiHumidity,
+} from 'react-icons/wi';
+import { 
+  FiMapPin, 
+  FiClock, 
+  FiCalendar 
 } from 'react-icons/fi';
 import { getWeatherData, getLocationData } from '../services/weatherService';
 
-// Add WeatherIcon component
-const WeatherIcon = ({ condition, className }) => {
-  // Placeholder for now. We'll map weather conditions to icons later.
-  const iconSize = '2rem';
-  switch (condition) {
-    case 'clear':
-      return <FiSun size={iconSize} className={className} />;
-    case 'rain':
-      return <FiCloudRain size={iconSize} className={className} />;
-    // Add more cases as needed
-    default:
-      return <FiSun size={iconSize} className={className} />;
-  }
+const WeatherIcon = ({ condition, size = 24, className = '' }) => {
+  const icons = {
+    clear: WiDaySunny,
+    rain: WiRain,
+    snow: WiSnow,
+    thunderstorm: WiThunderstorm,
+    fog: WiFog,
+    cloudy: WiCloudy
+  };
+
+  const IconComponent = icons[condition] || WiDaySunny;
+  return <IconComponent size={size} className={className} />;
 };
+
+const WeatherCard = ({ icon: Icon, title, value, unit = '', className = '' }) => (
+  <div className={`bg-white/10 backdrop-blur-lg rounded-xl p-4 flex items-center space-x-3 ${className}`}>
+    <Icon className="text-white/80" size={24} />
+    <div>
+      <p className="text-sm text-white/60">{title}</p>
+      <p className="text-lg font-semibold text-white">{value}{unit}</p>
+    </div>
+  </div>
+);
+
+const DailyForecast = ({ data }) => (
+  <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4">
+    <div className="flex items-center space-x-2 mb-3">
+      <FiCalendar size={20} className="text-white/80" />
+      <h3 className="text-lg font-semibold text-white">Daily Forecast</h3>
+    </div>
+    <div className="grid grid-cols-2 gap-4">
+      <div>
+        <p className="text-sm text-white/60">Temperature</p>
+        <p className="text-lg font-semibold text-white">
+          {data.temperature_2m_max[0]}°C / {data.temperature_2m_min[0]}°C
+        </p>
+      </div>
+      <div>
+        <p className="text-sm text-white/60">UV Index</p>
+        <p className="text-lg font-semibold text-white">{data.uv_index_max[0]}</p>
+      </div>
+      <div>
+        <p className="text-sm text-white/60">Sunrise</p>
+        <p className="text-lg font-semibold text-white">
+          {new Date(data.sunrise[0]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+        </p>
+      </div>
+      <div>
+        <p className="text-sm text-white/60">Sunset</p>
+        <p className="text-lg font-semibold text-white">
+          {new Date(data.sunset[0]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+        </p>
+      </div>
+    </div>
+  </div>
+);
+
+const LoadingSpinner = () => (
+  <div className="flex justify-center items-center py-12">
+    <div className="w-12 h-12 border-4 border-white/20 border-t-white rounded-full animate-spin" />
+  </div>
+);
 
 function Header({ currentTime }) {
   const [weatherData, setWeatherData] = useState(null);
   const [location, setLocation] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const getUserLocation = async () => {
+    const fetchData = async () => {
       try {
         const position = await new Promise((resolve, reject) => {
           navigator.geolocation.getCurrentPosition(resolve, reject);
         });
 
         const { latitude, longitude } = position.coords;
-
-        const [weatherResponse, locationResponse] = await Promise.all([
+        const [weather, location] = await Promise.all([
           getWeatherData(latitude, longitude),
-          getLocationData(latitude, longitude),
+          getLocationData(latitude, longitude)
         ]);
 
-        setWeatherData(weatherResponse);
-        if (locationResponse?.results?.[0]) {
-          setLocation(locationResponse.results[0].components);
-        }
+        setWeatherData(weather);
+        setLocation(location?.results?.[0]?.components);
       } catch (error) {
-        console.error('Error getting location or data:', error);
+        console.error('Error fetching data:', error);
       } finally {
-        setLoading(false); // Ensure loading is set to false after data is fetched
+        setLoading(false);
       }
     };
 
-    getUserLocation();
+    fetchData();
   }, []);
 
+  const formatLocation = (location) => {
+    if (!location) return '';
+    const parts = [
+      location.city || location.town || location.village,
+      location.state,
+      location.country
+    ].filter(Boolean);
+    return parts.join(', ');
+  };
+
+  if (loading) return <LoadingSpinner />;
+
   return (
-    <div className="relative bg-gradient-to-br from-blue-500 to-indigo-700 text-white p-6 rounded-3xl shadow-2xl overflow-hidden transition-all duration-500 hover:shadow-3xl">
-      {/* Background elements for visual enhancement */}
-      <div className="absolute inset-0 z-0 opacity-30">
-        <div className="absolute top-0 left-0 w-20 h-20 rounded-full bg-yellow-300 blur-2xl"></div>
-        <div className="absolute bottom-0 right-0 w-32 h-32 rounded-full bg-pink-300 blur-2xl"></div>
-      </div>
-
-      <div className="relative z-10">
-        <h1 className="text-4xl md:text-5xl font-bold mb-8 text-center tracking-wider">
-          Personal Dashboard
-        </h1>
-
-        {loading ? (
-          // Loading Indicator
-          <div className="flex justify-center items-center py-8">
-            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-white"></div>
+    <div className="bg-gradient-to-br from-blue-600 to-purple-700 p-6 rounded-2xl shadow-xl">
+      <div className="max-w-6xl mx-auto space-y-6">
+        {/* Location and Time */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div className="flex items-center space-x-3">
+            <FiMapPin className="text-red-300" size={24} />
+            <h2 className="text-xl text-white font-medium">{formatLocation(location)}</h2>
           </div>
-        ) : (
-          // Main Content
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12">
-              {/* Current Time and Location */}
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <FiClock className="text-yellow-400 text-3xl mr-2" />
-                    <p className="text-3xl font-semibold">{currentTime.toLocaleTimeString()}</p>
-                  </div>
-                  {location && (
-                    <div className="flex items-center">
-                      <FiMapPin className="text-red-400 text-3xl mr-2" />
-                      <p className="text-xl">
-                        {[
-                          location.city || location.town || location.village,
-                          location.county,
-                          location.state,
-                          location.country,
-                        ].filter(Boolean).join(', ')}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-              {/* Current Weather */}
-              <div className="space-y-4">
-                {weatherData?.current && (
-                  <div className="bg-indigo-100 bg-opacity-20 p-4 rounded-lg">
-                    <div className="flex items-center justify-center">
-                      <FiThermometer className="text-red-400 text-3xl mr-2" />
-                      <p className="text-3xl font-semibold">
-                        {weatherData.current.temperature_2m}°C
-                      </p>
-                      <p className="text-xl ml-4">
-                        Feels like: {weatherData.current.apparent_temperature}°C
-                      </p>
-                    </div>
-                  </div>
-                )}
-                {weatherData?.current && (
-                  <div className="bg-indigo-100 bg-opacity-20 p-4 rounded-lg">
-                    <div className="flex items-center justify-center">
-                      <FiDroplet className="text-blue-400 text-3xl mr-2" />
-                      <p className="text-xl">
-                        Rain: {weatherData.current.rain}mm | Precipitation: {weatherData.current.precipitation}mm
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-            {/* Daily Forecast */}
-            {weatherData?.daily && (
-              <div className="mt-10 md:mt-12 flex flex-col items-center space-y-4">
-                <h2 className="text-2xl md:text-3xl font-semibold flex items-center justify-center">
-                  <FiCalendar className="text-yellow-300 mr-2" />
-                  Daily Forecast
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  <div className="bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg p-4 rounded-2xl shadow-lg border border-opacity-50 border-gray-300">
-                    <p className="text-xl md:text-2xl font-bold">
-                      Max: {weatherData.daily.temperature_2m_max[0]}°C
-                    </p>
-                    <p className="text-xl">Min: {weatherData.daily.temperature_2m_min[0]}°C</p>
-                    <p className="text-xl">UV Index: {weatherData.daily.uv_index_max[0]}</p>
-                  </div>
-                  <div className="bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg p-4 rounded-2xl shadow-lg border border-opacity-50 border-gray-300">
-                    <p className="text-xl">Rain Sum: {weatherData.daily.rain_sum[0]}mm</p>
-                    <p className="text-xl">
-                      Sunrise: {new Date(weatherData.daily.sunrise[0]).toLocaleTimeString()}
-                    </p>
-                    <p className="text-xl">
-                      Sunset: {new Date(weatherData.daily.sunset[0]).toLocaleTimeString()}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-          </>
+          <div className="flex items-center space-x-3">
+            <FiClock className="text-yellow-300" size={24} />
+            <p className="text-xl text-white font-medium">
+              {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            </p>
+          </div>
+        </div>
+
+        {/* Current Weather */}
+        {weatherData?.current && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <WeatherCard 
+              icon={WiThermometer}
+              title="Temperature"
+              value={weatherData.current.temperature_2m}
+              unit="°C"
+              className="md:col-span-2"
+            />
+            <WeatherCard 
+              icon={WiHumidity}
+              title="Precipitation"
+              value={weatherData.current.precipitation}
+              unit="mm"
+            />
+          </div>
+        )}
+
+        {/* Daily Forecast */}
+        {weatherData?.daily && (
+          <div className="mt-6">
+            <DailyForecast data={weatherData.daily} />
+          </div>
         )}
       </div>
     </div>

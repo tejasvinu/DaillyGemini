@@ -34,5 +34,14 @@ export const notesService = {
       headers: getAuthHeaders()
     });
     return response.data;
+  },
+
+  async updateNote(id, status) {
+    const response = await api.patch(
+      `/api/notes/${id}`,
+      { status },
+      { headers: getAuthHeaders() }
+    );
+    return response.data;
   }
 };

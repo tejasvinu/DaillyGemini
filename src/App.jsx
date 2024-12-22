@@ -1,5 +1,5 @@
 // App.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, createContext, useContext } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { notesService } from './services/notesService';
@@ -12,6 +12,46 @@ import MediaPlayer from './components/MediaPlayer';
 import Login from './components/Login';
 import Register from './components/Register';
 import Callback from './components/Callback';
+
+const ThemeContext = createContext();
+
+const getInitialTheme = () => {
+  if (typeof window !== 'undefined' && window.localStorage) {
+    const storedPrefs = window.localStorage.getItem('color-theme');
+    if (typeof storedPrefs === 'string') {
+      return storedPrefs;
+    }
+    const userMedia = window.matchMedia('(prefers-color-scheme: dark)');
+    if (userMedia.matches) {
+      return 'dark';
+    }
+  }
+  return 'light';
+};
+
+export const useTheme = () => useContext(ThemeContext);
+
+function ThemeProvider({ children }) {
+  const [theme, setTheme] = useState(getInitialTheme);
+
+  const rawSetTheme = (rawTheme) => {
+    const root = window.document.documentElement;
+    const isDark = rawTheme === 'dark';
+    root.classList.remove(isDark ? 'light' : 'dark');
+    root.classList.add(rawTheme);
+    localStorage.setItem('color-theme', rawTheme);
+  };
+
+  useEffect(() => {
+    rawSetTheme(theme);
+  }, [theme]);
+
+  return (
+    <ThemeContext.Provider value={{ theme, setTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+}
 
 function App() {
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -65,6 +105,18 @@ function App() {
     }
   };
 
+  const handleUpdateNote = async (id, status) => {
+    try {
+      setIsLoading(true);
+      const updatedNote = await notesService.updateNote(id, status);
+      setNotes(notes.map(note => note._id === id ? updatedNote : note));
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const mockEvents = [
     { title: 'Daily Standup', time: '10:00 AM' },
     { title: 'Client Meeting', time: '2:00 PM' },
@@ -72,42 +124,45 @@ function App() {
   ];
 
   return (
-    <AuthProvider>
-      <Router>
-        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white font-sans">
-          <Navbar />
-          <div className="container mx-auto px-4 pt-20 pb-8 sm:px-6 lg:px-8">
-            <Routes>
-              <Route path="/callback" element={<Callback />} />
-              <Route
-                path="/login"
-                element={<AuthCard element={<Login />} />}
-              />
-              <Route
-                path="/register"
-                element={<AuthCard element={<Register />} />}
-              />
-              <Route
-                path="/"
-                element={
-                  <PrivateRoute>
-                    <Dashboard
-                      currentTime={currentTime}
-                      notes={notes}
-                      handleAddNote={handleAddNote}
-                      handleDeleteNote={handleDeleteNote}
-                      isLoading={isLoading}
-                      error={error}
-                      mockEvents={mockEvents}
-                    />
-                  </PrivateRoute>
-                }
-              />
-            </Routes>
+    <ThemeProvider>
+      <AuthProvider>
+        <Router>
+          <div className="min-h-screen bg-gradient-to-br from-gray-800 via-gray-700 to-black text-white font-sans">
+            <Navbar />
+            <div className="container mx-auto px-4 pt-24 pb-8 sm:px-6 lg:px-8">
+              <Routes>
+                <Route path="/callback" element={<Callback />} />
+                <Route
+                  path="/login"
+                  element={<AuthCard element={<Login />} />}
+                />
+                <Route
+                  path="/register"
+                  element={<AuthCard element={<Register />} />}
+                />
+                <Route
+                  path="/"
+                  element={
+                    <PrivateRoute>
+                      <Dashboard
+                        currentTime={currentTime}
+                        notes={notes}
+                        handleAddNote={handleAddNote}
+                        handleDeleteNote={handleDeleteNote}
+                        handleUpdateNote={handleUpdateNote} // Added prop
+                        isLoading={isLoading}
+                        error={error}
+                        mockEvents={mockEvents}
+                      />
+                    </PrivateRoute>
+                  }
+                />
+              </Routes>
+            </div>
           </div>
-        </div>
-      </Router>
-    </AuthProvider>
+        </Router>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 
@@ -124,7 +179,7 @@ const Dashboard = ({ currentTime, notes, handleAddNote, handleDeleteNote, isLoad
     <div className="bg-gray-800/70 backdrop-blur-sm rounded-xl p-4 md:p-6 shadow-xl">
       <Header currentTime={currentTime} />
     </div>
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 lg:gap-10">
       <WidgetCard>
         <NotesWidget
           notes={notes}

@@ -1,73 +1,166 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { MdKeyboardArrowDown } from 'react-icons/md';
+// import Link from 'next/link'; // Changed from 'next/link' to 'react-router-dom'
+import { Link } from 'react-router-dom'; // New import
+import { motion, AnimatePresence } from 'framer-motion';
+import { MdKeyboardArrowDown, MdDashboard, MdSettings, MdHelp, MdLogout } from 'react-icons/md';
+import { FiBell, FiSearch } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 
 const Navbar = () => {
   const { token, user, clearAuth } = useAuth();
   const [showDropdown, setShowDropdown] = useState(false);
-  
+  const [searchFocused, setSearchFocused] = useState(false);
+
   const getInitials = (name) => {
     return name ? name.split(' ').map(n => n[0]).join('').toUpperCase() : '?';
   };
 
+  const menuItems = [
+    { icon: MdDashboard, label: 'Dashboard', desc: 'View your activity' },
+    { icon: MdSettings, label: 'Settings', desc: 'Manage your account' },
+    { icon: MdHelp, label: 'Help', desc: 'Get support' },
+  ];
+
   return (
-    <nav className="fixed top-0 left-0 right-0 bg-white/5 backdrop-blur-lg border-b border-white/10 z-50">
+    <nav className="fixed top-0 left-0 right-0 bg-slate-900/50 backdrop-blur-xl border-b border-slate-700/30 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-14 md:h-16">
-          <Link to="/" className="flex items-center space-x-2">
-            <span className="text-2xl font-light tracking-wider text-white">
-              Daily<span className="font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Gemini</span>
-            </span>
-          </Link>
+        <div className="flex items-center justify-between h-16 md:h-20">
+          <div className="flex items-center space-x-8">
+            <Link to="/" className="flex items-center space-x-2"> {/* Changed from href to to */}
+              <motion.span 
+                className="text-2xl font-light tracking-wider text-white"
+                whileHover={{ scale: 1.02 }}
+              >
+                Dailyy
+                <span className="font-bold bg-gradient-to-r from-violet-200 to-blue-400 bg-clip-text text-transparent">
+                  Gemini
+                </span>
+              </motion.span>
+            </Link>
+            
+            <div className={`relative hidden md:block transition-all duration-300 ${searchFocused ? 'w-80' : 'w-64'}`}>
+              <input
+                type="text"
+                placeholder="Search..."
+                onFocus={() => setSearchFocused(true)}
+                onBlur={() => setSearchFocused(false)}
+                className="w-full bg-slate-800/50 text-slate-200 placeholder-slate-400 px-4 py-2 pl-10 rounded-lg border border-slate-700/50 focus:border-indigo-500/50 focus:ring-2 focus:ring-indigo-500/20 transition-all duration-300"
+              />
+              <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            </div>
+          </div>
 
           {token ? (
-            <div className="relative">
-              <button
-                className="group flex items-center space-x-3 py-2 px-4 rounded-full transition-all duration-300 hover:bg-white/10"
-                onClick={() => setShowDropdown(!showDropdown)}
+            <div className="flex items-center space-x-6">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="relative p-2 text-slate-300 hover:text-white transition-colors duration-200"
               >
-                <div className="relative">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-400 to-pink-400 flex items-center justify-center text-white font-medium transition-transform duration-300 group-hover:scale-105">
-                    {getInitials(user?.username)}
-                  </div>
-                  <div className="absolute inset-0 w-10 h-10 rounded-full bg-gradient-to-r from-purple-400 to-pink-400 blur-lg opacity-30 group-hover:opacity-50 transition-opacity duration-300"></div>
-                </div>
-                <span className="text-white/90 font-light hidden md:block">
-                  {user?.username}
-                </span>
-                <MdKeyboardArrowDown 
-                  className="w-4 h-4 text-white/70 transition-transform duration-300 group-hover:text-white"
-                  style={{ transform: showDropdown ? 'rotate(180deg)' : 'rotate(0deg)' }}
-                />
-              </button>
+                <FiBell className="w-5 h-5" />
+                <span className="absolute top-1 right-1 w-2 h-2 bg-indigo-500 rounded-full" />
+              </motion.button>
 
-              {showDropdown && (
-                <div className="absolute right-0 mt-2 w-64 origin-top-right rounded-lg bg-white/10 backdrop-blur-lg border border-white/10 shadow-lg transition-all duration-300">
-                  <div className="p-2 space-y-1">
-                    <div className="px-3 py-2 rounded-md text-sm text-white/70">
-                      {user?.email}
+              <div className="relative">
+                <motion.button
+                  className="group flex items-center space-x-3 py-2 px-4 rounded-lg transition-all duration-300 hover:bg-slate-800/50"
+                  onClick={() => setShowDropdown(!showDropdown)}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <div className="relative">
+                    <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-violet-400 to-indigo-400 flex items-center justify-center text-white font-medium shadow-lg">
+                      {getInitials(user?.username)}
                     </div>
-                    <button
-                      onClick={() => {
-                        clearAuth();
-                        setShowDropdown(false);
-                      }}
-                      className="w-full text-left px-3 py-2 text-sm text-white/90 hover:bg-white/10 rounded-md transition-colors duration-200"
-                    >
-                      Sign out
-                    </button>
+                    <div className="absolute inset-0 w-10 h-10 rounded-lg bg-gradient-to-r from-violet-400 to-indigo-400 blur-lg opacity-30 group-hover:opacity-50 transition-opacity duration-300" />
                   </div>
-                </div>
-              )}
+                  <div className="hidden md:block">
+                    <p className="text-sm font-medium text-slate-200">
+                      {user?.username}
+                    </p>
+                    <p className="text-xs text-slate-400">
+                      {user?.role}
+                    </p>
+                  </div>
+                  <MdKeyboardArrowDown 
+                    className="w-5 h-5 text-slate-400 transition-transform duration-300"
+                    style={{ transform: showDropdown ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                  />
+                </motion.button>
+
+                <AnimatePresence>
+                  {showDropdown && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute right-0 mt-2 w-72 origin-top-right rounded-lg bg-slate-800/90 backdrop-blur-xl border border-slate-700/50 shadow-xl"
+                    >
+                      <div className="p-3">
+                        <div className="flex items-center space-x-3 p-3 bg-slate-700/30 rounded-lg mb-2">
+                          <div className="w-12 h-12 rounded-lg bg-gradient-to-r from-violet-400 to-indigo-400 flex items-center justify-center text-white text-lg font-medium">
+                            {getInitials(user?.username)}
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-white">{user?.username}</p>
+                            <p className="text-xs text-slate-400">{user?.email}</p>
+                          </div>
+                        </div>
+
+                        <div className="space-y-1">
+                          {menuItems.map((item, index) => (
+                            <motion.button
+                              key={index}
+                              whileHover={{ x: 4 }}
+                              className="w-full flex items-center space-x-3 p-2 text-left text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-lg transition-colors duration-200"
+                            >
+                              <item.icon className="w-5 h-5" />
+                              <div>
+                                <p className="text-sm font-medium">{item.label}</p>
+                                <p className="text-xs text-slate-400">{item.desc}</p>
+                              </div>
+                            </motion.button>
+                          ))}
+                          
+                          <motion.button
+                            whileHover={{ x: 4 }}
+                            onClick={() => {
+                              clearAuth();
+                              setShowDropdown(false);
+                            }}
+                            className="w-full flex items-center space-x-3 p-2 text-left text-red-400 hover:text-red-300 hover:bg-red-400/10 rounded-lg transition-colors duration-200"
+                          >
+                            <MdLogout className="w-5 h-5" />
+                            <div>
+                              <p className="text-sm font-medium">Sign out</p>
+                              <p className="text-xs opacity-70">End your session</p>
+                            </div>
+                          </motion.button>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </div>
           ) : (
-            <div className="space-x-2">
-              <Link to="/login" className="px-4 py-2 text-sm text-white/90 hover:text-white transition-colors duration-200">
-                Sign in
+            <div className="flex items-center space-x-3">
+              <Link to="/login" className="px-4 py-2 text-sm text-slate-300 hover:text-white transition-colors duration-200"> {/* Changed from href to to */}
+                <motion.span
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  Sign in
+                </motion.span>
               </Link>
-              <Link to="/register" className="px-4 py-2 text-sm text-white bg-white/10 rounded-full hover:bg-white/20 transition-colors duration-200">
-                Sign up
+              <Link to="/register" className="px-4 py-2 text-sm text-white bg-indigo-500 hover:bg-indigo-400 rounded-lg transition-colors duration-200"> {/* Changed from href to to */}
+                <motion.span
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  Sign up
+                </motion.span>
               </Link>
             </div>
           )}
