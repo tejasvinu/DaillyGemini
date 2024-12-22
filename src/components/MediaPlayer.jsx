@@ -171,7 +171,7 @@ function MediaPlayer() {
     return (
       <div className="flex items-center justify-center h-full w-full bg-gradient-to-br from-purple-900 to-black rounded-xl p-8">
         <button
-          onClick={() => spotifyAuth.login()}
+          onClick={() => spotifyAuth.initiateLogin()}
           className="px-6 py-3 bg-green-500 hover:bg-green-600 text-white rounded-full font-medium transform hover:scale-105 transition-all flex items-center space-x-2"
         >
           <span>Connect Spotify</span>
