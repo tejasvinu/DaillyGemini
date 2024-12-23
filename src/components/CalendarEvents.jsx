@@ -1,13 +1,61 @@
 // components/CalendarEvents.js
 import { useState, useEffect } from 'react';
-import { FiCalendar, FiRefreshCw } from 'react-icons/fi';
+import { FiCalendar, FiRefreshCw, FiX } from 'react-icons/fi';
 import { FcGoogle } from 'react-icons/fc';
 import { calendarService } from '../services/CalendarService';
+import Modal from './Modal';
+
+function EventDetailsModal({ event, onClose }) {
+  if (!event) return null;
+
+  return (
+    <Modal onClose={onClose}>
+      <div className="bg-gray-800 rounded-lg p-6 max-w-lg w-full relative">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-xl font-semibold">{event.summary}</h3>
+          <button onClick={onClose} className="p-1 hover:bg-gray-700 rounded">
+            <FiX className="text-xl" />
+          </button>
+        </div>
+        
+        <div className="space-y-3 text-gray-300">
+          <div>
+            <span className="text-gray-400">Time: </span>
+            {new Date(event.start.dateTime || event.start.date).toLocaleString()}
+          </div>
+          <div>
+            <span className="text-gray-400">Duration: </span>
+            {new Date(event.end.dateTime).getHours() - new Date(event.start.dateTime).getHours()} hour(s)
+          </div>
+          <div>
+            <span className="text-gray-400">Status: </span>
+            <span className="capitalize">{event.status}</span>
+          </div>
+          <div>
+            <span className="text-gray-400">Timezone: </span>
+            {event.start.timeZone}
+          </div>
+          <div>
+            <a 
+              href={event.htmlLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-400 hover:text-blue-300"
+            >
+              View in Google Calendar
+            </a>
+          </div>
+        </div>
+      </div>
+    </Modal>
+  );
+}
 
 function CalendarEvents() {
   const [events, setEvents] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [selectedEvent, setSelectedEvent] = useState(null);
 
   const startAuth = async () => {
     setIsLoading(true);
@@ -25,6 +73,7 @@ function CalendarEvents() {
     setIsLoading(true);
     try {
       const data = await calendarService.getEvents();
+      console.log(data);
       setEvents(data);
     } catch (err) {
       setError('Failed to fetch events');
@@ -71,9 +120,13 @@ function CalendarEvents() {
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
         </div>
       ) : (
-        <ul className="space-y-3">
+        <ul className="space-y-2">
           {events.map((event) => (
-            <li key={event.id} className="bg-gray-600 p-3 rounded-lg flex items-center justify-between hover:ring-2 ring-gray-400 transition">
+            <li 
+              key={event.id} 
+              className="bg-gray-600 p-3 rounded-lg flex items-center justify-between hover:bg-gray-500 cursor-pointer transition"
+              onClick={() => setSelectedEvent(event)}
+            >
               <span className="font-medium">{event.summary}</span>
               <span className="text-sm text-gray-300">
                 {new Date(event.start.dateTime || event.start.date).toLocaleTimeString([], { 
@@ -108,6 +161,11 @@ function CalendarEvents() {
           </button>
         </div>
       )}
+
+      <EventDetailsModal 
+        event={selectedEvent} 
+        onClose={() => setSelectedEvent(null)} 
+      />
     </div>
   );
 }

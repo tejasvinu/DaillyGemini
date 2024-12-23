@@ -13,6 +13,8 @@ import Login from './components/Login';
 import Register from './components/Register';
 import Callback from './components/Callback';
 import Googlecallback from './components/googlecallback';
+import MailsWidget from './components/MailsWidget';
+import UserInfoWidget from './components/UserInfoWidget';
 
 const ThemeContext = createContext();
 
@@ -176,6 +178,9 @@ const Dashboard = ({ currentTime, notes, handleAddNote, handleDeleteNote, handle
     </div>
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 lg:gap-10">
       <WidgetCard>
+        <UserInfoWidget />
+      </WidgetCard>
+      <WidgetCard>
         <NotesWidget
           notes={notes}
           handleAddNote={handleAddNote}
@@ -190,6 +195,9 @@ const Dashboard = ({ currentTime, notes, handleAddNote, handleDeleteNote, handle
       </WidgetCard>
       <WidgetCard className="md:col-span-2 lg:col-span-1">
         <MediaPlayer />
+      </WidgetCard>
+      <WidgetCard>
+        <MailsWidget />
       </WidgetCard>
     </div>
   </div>
