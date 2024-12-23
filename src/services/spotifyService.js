@@ -1,4 +1,4 @@
-import { fetchWebApi } from './spotifyAuthService';
+import { fetchWebApi, clearTokens } from './spotifyAuthService';
 
 export const getCurrentPlayback = async () => {
   try {
@@ -74,40 +74,3 @@ export const getRandomPlaylist = async () => {
   }
 };
 
-export async function fetchWebApi(endpoint, method, body) {
-  try {
-    const res = await fetch(`https://api.spotify.com/v1/${endpoint}`, {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-      },
-      method,
-      body: body ? JSON.stringify(body) : undefined
-    });
-    
-    if (res.status === 401) {
-      clearTokens();
-      return { success: false };
-    }
-    
-    if (res.status === 204) {
-      return {};
-    }
-    
-    if (!res.ok) {
-      if (res.status === 0) {
-        throw new Error('Request was blocked by the client.');
-      }
-      throw new Error(`API call failed: ${res.status} ${res.statusText}`);
-    }
-    
-    return await res.json();
-  } catch (error) {
-    if (error.message === 'Request was blocked by the client.') {
-      console.error('API call was blocked by the client:', error);
-      throw error;
-    }
-    console.error('API call error:', error);
-    throw error;
-  }
-}

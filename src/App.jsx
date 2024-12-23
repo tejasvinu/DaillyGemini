@@ -12,6 +12,7 @@ import MediaPlayer from './components/MediaPlayer';
 import Login from './components/Login';
 import Register from './components/Register';
 import Callback from './components/Callback';
+import Googlecallback from './components/googlecallback';
 
 const ThemeContext = createContext();
 
@@ -117,12 +118,6 @@ function App() {
     }
   };
 
-  const mockEvents = [
-    { title: 'Daily Standup', time: '10:00 AM' },
-    { title: 'Client Meeting', time: '2:00 PM' },
-    { title: 'Code Review', time: '4:00 PM' },
-  ];
-
   return (
     <ThemeProvider>
       <AuthProvider>
@@ -132,6 +127,7 @@ function App() {
             <div className="container mx-auto px-4 pt-24 pb-8 sm:px-6 lg:px-8">
               <Routes>
                 <Route path="/callback" element={<Callback />} />
+                <Route path="/googlecallback" element={<Googlecallback />} />
                 <Route
                   path="/login"
                   element={<AuthCard element={<Login />} />}
@@ -149,10 +145,9 @@ function App() {
                         notes={notes}
                         handleAddNote={handleAddNote}
                         handleDeleteNote={handleDeleteNote}
-                        handleUpdateNote={handleUpdateNote} // Added prop
+                        handleUpdateNote={handleUpdateNote}
                         isLoading={isLoading}
                         error={error}
-                        mockEvents={mockEvents}
                       />
                     </PrivateRoute>
                   }
@@ -174,7 +169,7 @@ const AuthCard = ({ element }) => (
 );
 
 // Dashboard component
-const Dashboard = ({ currentTime, notes, handleAddNote, handleDeleteNote, isLoading, error, mockEvents }) => (
+const Dashboard = ({ currentTime, notes, handleAddNote, handleDeleteNote, handleUpdateNote, isLoading, error }) => (
   <div className="space-y-6 md:space-y-8">
     <div className="bg-gray-800/70 backdrop-blur-sm rounded-xl p-4 md:p-6 shadow-xl">
       <Header currentTime={currentTime} />
@@ -185,12 +180,13 @@ const Dashboard = ({ currentTime, notes, handleAddNote, handleDeleteNote, isLoad
           notes={notes}
           handleAddNote={handleAddNote}
           handleDeleteNote={handleDeleteNote}
+          handleUpdateNote={handleUpdateNote}
           isLoading={isLoading}
           error={error}
         />
       </WidgetCard>
       <WidgetCard>
-        <CalendarEvents mockEvents={mockEvents} />
+        <CalendarEvents />
       </WidgetCard>
       <WidgetCard className="md:col-span-2 lg:col-span-1">
         <MediaPlayer />
