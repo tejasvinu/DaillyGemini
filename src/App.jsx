@@ -15,6 +15,8 @@ import Callback from './components/Callback';
 import Googlecallback from './components/googlecallback';
 import MailsWidget from './components/MailsWidget';
 import UserInfoWidget from './components/UserInfoWidget';
+import Chatbot from './components/Chatbot';
+import FloatingAssistant from './components/FloatingAssistant';
 
 const ThemeContext = createContext();
 
@@ -154,8 +156,19 @@ function App() {
                     </PrivateRoute>
                   }
                 />
+                <Route
+                  path="/chatbot"
+                  element={
+                    <PrivateRoute>
+                      <div className="h-[calc(100vh-6rem)]">
+                        <Chatbot />
+                      </div>
+                    </PrivateRoute>
+                  }
+                />
               </Routes>
             </div>
+            <FloatingAssistant />
           </div>
         </Router>
       </AuthProvider>
