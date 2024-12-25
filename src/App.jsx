@@ -17,6 +17,7 @@ import MailsWidget from './components/MailsWidget';
 import UserInfoWidget from './components/UserInfoWidget';
 import Chatbot from './components/Chatbot';
 import FloatingAssistant from './components/FloatingAssistant';
+import Learning from './components/Learning';
 
 const ThemeContext = createContext();
 
@@ -166,6 +167,7 @@ function App() {
                     </PrivateRoute>
                   }
                 />
+                <Route path="/learning" element={<Learning />} />
               </Routes>
             </div>
             <FloatingAssistant />

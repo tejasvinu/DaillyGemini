@@ -62,10 +62,10 @@ function NotesWidget({ notes, handleAddNote, handleDeleteNote, handleUpdateNote,
           type="text"
           value={newNote}
           onChange={(e) => setNewNote(e.target.value)}
-          className="flex-1 p-3 border border-gray-200 dark:border-gray-700 rounded-lg 
+          className="flex-1 p-3 border border-gray-600 rounded-lg 
+                   bg-gray-700 text-white placeholder-gray-400
                    focus:outline-none focus:ring-2 focus:ring-blue-500 
-                   text-gray-700 dark:text-gray-100 bg-white dark:bg-gray-800 
-                   placeholder-gray-500 transition-all duration-200"
+                   transition-all duration-200"
           placeholder="Add a task or note..."
           disabled={isLoading}
           onKeyDown={(e) => e.key === 'Enter' && handleAddNoteInternal()}

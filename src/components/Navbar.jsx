@@ -2,8 +2,8 @@ import { useState } from 'react';
 // import Link from 'next/link'; // Changed from 'next/link' to 'react-router-dom'
 import { Link } from 'react-router-dom'; // New import
 import { motion, AnimatePresence } from 'framer-motion';
-import { MdKeyboardArrowDown, MdDashboard, MdSettings, MdHelp, MdLogout } from 'react-icons/md';
-import { FiBell, FiSearch } from 'react-icons/fi';
+import { MdKeyboardArrowDown, MdDashboard, MdSettings, MdHelp, MdLogout, MdBook } from 'react-icons/md';
+import { FiBell } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 
 const Navbar = () => {
@@ -19,6 +19,7 @@ const Navbar = () => {
     { icon: MdDashboard, label: 'Dashboard', desc: 'View your activity' },
     { icon: MdSettings, label: 'Settings', desc: 'Manage your account' },
     { icon: MdHelp, label: 'Help', desc: 'Get support' },
+    { icon: MdBook, label: 'Learning', desc: 'Access learning resources' },
   ];
 
   return (
@@ -38,16 +39,10 @@ const Navbar = () => {
               </motion.span>
             </Link>
             
-            <div className={`relative hidden md:block transition-all duration-300 ${searchFocused ? 'w-80' : 'w-64'}`}>
-              <input
-                type="text"
-                placeholder="Search..."
-                onFocus={() => setSearchFocused(true)}
-                onBlur={() => setSearchFocused(false)}
-                className="w-full bg-slate-800/50 text-slate-200 placeholder-slate-400 px-4 py-2 pl-10 rounded-lg border border-slate-700/50 focus:border-indigo-500/50 focus:ring-2 focus:ring-indigo-500/20 transition-all duration-300"
-              />
-              <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-            </div>
+            {/* Add Learning link */}
+            <Link to="/learning" className="hidden md:block text-slate-300 hover:text-white transition-colors duration-200">
+              Learning
+            </Link>
           </div>
 
           {token ? (
