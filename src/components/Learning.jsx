@@ -5,6 +5,11 @@ import { cardService } from '../services/cardService';
 function FlashCard({ question, answer }) {
   const [isFlipped, setIsFlipped] = useState(false);
 
+  // Reset flip state when question changes
+  useEffect(() => {
+    setIsFlipped(false);
+  }, [question]); // Dependency on question ensures reset on navigation
+
   return (
     <div 
       className="w-[320px] h-[400px] md:w-[600px] md:h-[400px] [perspective:1000px] mx-auto"
@@ -162,6 +167,12 @@ function Learning() {
     setIsModalOpen(true);
   };
 
+  const closeChat = () => {
+    setCurrentFolder(null);
+    setChatHistory([]);
+    setChatMessage('');
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 sm:p-8">
       <div className="max-w-6xl mx-auto">
@@ -237,6 +248,21 @@ function Learning() {
         {/* Chat Interface */}
         {currentFolder && (
           <div className="bg-white rounded-xl shadow-lg p-6">
+            <div className="flex justify-between items-center mb-4">
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-500">Chatting about:</span>
+                <span className="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full font-medium">
+                  {currentFolder.name}
+                </span>
+              </div>
+              <button 
+                onClick={closeChat}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <span className="sr-only">Close chat</span>
+                ✕
+              </button>
+            </div>
             <div className="mb-4 h-64 overflow-y-auto bg-gray-50 rounded-lg p-4">
               {chatHistory.map((msg, i) => (
                 <div key={i} 
@@ -267,6 +293,7 @@ function Learning() {
             </div>
           </div>
         )}
+
       </div>
     </div>
   );
