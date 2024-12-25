@@ -63,7 +63,7 @@ function NotesWidget({ notes, handleAddNote, handleDeleteNote, handleUpdateNote,
           value={newNote}
           onChange={(e) => setNewNote(e.target.value)}
           className="flex-1 p-3 border border-gray-600 rounded-lg 
-                   bg-gray-700 text-white placeholder-gray-400
+                   text-black placeholder-gray-400
                    focus:outline-none focus:ring-2 focus:ring-blue-500 
                    transition-all duration-200"
           placeholder="Add a task or note..."
