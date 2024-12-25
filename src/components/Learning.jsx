@@ -256,7 +256,7 @@ function Learning() {
                 value={chatMessage}
                 onChange={(e) => setChatMessage(e.target.value)}
                 placeholder="Ask about these cards..."
-                className="flex-1 p-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-indigo-400"
+                className="flex-1 p-3 border-2 text-black border-gray-200 rounded-lg focus:outline-none focus:border-indigo-400"
               />
               <button 
                 onClick={sendMessage}
