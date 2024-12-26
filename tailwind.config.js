@@ -6,7 +6,11 @@ import aspectRatio from '@tailwindcss/aspect-ratio';
 export default {
   content: ['./src/**/*.{js,jsx,ts,tsx}', './public/index.html'],
   theme: {
-    extend: {},
+    extend: {
+      textColor: {
+        DEFAULT: '#000000' // or your preferred default color
+      }
+    },
   },
   variants: {
     extend: {},

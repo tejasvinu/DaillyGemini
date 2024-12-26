@@ -18,6 +18,7 @@ import UserInfoWidget from './components/UserInfoWidget';
 import Chatbot from './components/Chatbot';
 import FloatingAssistant from './components/FloatingAssistant';
 import Learning from './components/Learning';
+import AdventureGame from './components/AdventureGame';
 
 const ThemeContext = createContext();
 
@@ -163,6 +164,16 @@ function App() {
                     <PrivateRoute>
                       <div className="h-[calc(100vh-6rem)]">
                         <Chatbot />
+                      </div>
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/advent"
+                  element={
+                    <PrivateRoute>
+                      <div className="min-h-[calc(100vh-6rem)]">
+                        <AdventureGame />
                       </div>
                     </PrivateRoute>
                   }
