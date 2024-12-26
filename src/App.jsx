@@ -199,23 +199,17 @@ const AuthCard = ({ element }) => (
 // Dashboard component
 const Dashboard = ({ currentTime, notes, handleAddNote, handleDeleteNote, handleUpdateNote, isLoading, error }) => (
   <div className="space-y-6 md:space-y-8">
-    <div className="bg-gray-800/70 backdrop-blur-sm rounded-xl p-4 md:p-6 shadow-xl">
-      <Header currentTime={currentTime} />
-    </div>
+    <Header currentTime={currentTime} />
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 lg:gap-10">
-      <WidgetCard>
-        <UserInfoWidget />
-      </WidgetCard>
-      <WidgetCard>
-        <NotesWidget
-          notes={notes}
-          handleAddNote={handleAddNote}
-          handleDeleteNote={handleDeleteNote}
-          handleUpdateNote={handleUpdateNote}
-          isLoading={isLoading}
-          error={error}
-        />
-      </WidgetCard>
+      <UserInfoWidget />
+      <NotesWidget
+        notes={notes}
+        handleAddNote={handleAddNote}
+        handleDeleteNote={handleDeleteNote}
+        handleUpdateNote={handleUpdateNote}
+        isLoading={isLoading}
+        error={error}
+      />
       <WidgetCard>
         <CalendarEvents />
       </WidgetCard>

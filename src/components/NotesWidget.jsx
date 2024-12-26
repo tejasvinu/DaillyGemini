@@ -40,16 +40,16 @@ function NotesWidget({ notes, handleAddNote, handleDeleteNote, handleUpdateNote,
   }
 
   return (
-    <div className="w-full bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 space-y-6 transition-colors duration-200">
+    <div className="w-full bg-gray-800/50 rounded-xl shadow-xl p-6 space-y-6 transition-all duration-200 hover:scale-[1.02]">
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-100">Tasks & Notes</h2>
+        <h2 className="text-xl font-semibold text-white dark:text-gray-100">Tasks & Notes</h2>
         <div className="flex gap-3 text-sm">
           {['All', 'Active', 'Completed'].map((label, i) => (
             <button
               key={label}
               onClick={() => setFilter(i)}
               className={`hover:text-blue-600 transition-colors duration-200
-                      ${i === filter ? 'text-blue-600 font-medium' : 'text-gray-600 dark:text-gray-400'}`}
+                      ${i === filter ? 'text-blue-600 font-medium' : 'text-white dark:text-gray-400'}`}
             >
               {label}
             </button>
