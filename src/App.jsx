@@ -19,6 +19,7 @@ import Chatbot from './components/Chatbot';
 import FloatingAssistant from './components/FloatingAssistant';
 import Learning from './components/Learning';
 import AdventureGame from './components/AdventureGame';
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const ThemeContext = createContext();
 
@@ -182,6 +183,7 @@ function App() {
               </Routes>
             </div>
             <FloatingAssistant />
+            <SpeedInsights />
           </div>
         </Router>
       </AuthProvider>
