@@ -4,7 +4,6 @@ import { getWeatherData, getLocationData } from '../services/weatherService';
 
 const Header = () => {
   const [mounted, setMounted] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
   const [weatherData, setWeatherData] = useState(null);
   const [location, setLocation] = useState(null);
   const [timeData, setTimeData] = useState({
@@ -123,8 +122,8 @@ const Header = () => {
 
   return (
     <div className="w-full max-w-7xl px-2 md:px-4 lg:px-6 mb-8 mx-auto">
-      <div className={`w-full rounded-2xl shadow-xl relative ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
-        <div className={`absolute inset-2 ${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl`} />
+      <div className="w-full rounded-2xl shadow-xl relative bg-gray-800">
+        <div className="absolute inset-2 bg-gray-800 rounded-xl" />
         <div className="relative h-full p-4 md:p-6 flex flex-col justify-between gap-4">
           {/* Header Row */}
           <div className="flex justify-between items-center">
@@ -134,7 +133,7 @@ const Header = () => {
                 <circle cx="12" cy="10" r="3" />
               </svg>
               <div>
-                <h2 className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-500'}`}>
+                <h2 className="text-sm font-medium text-gray-300">
                   {formatLocation(location)}
                 </h2>
                 <p className="text-xs text-gray-400">
@@ -142,14 +141,6 @@ const Header = () => {
                 </p>
               </div>
             </div>
-            <button
-              onClick={() => setDarkMode(!darkMode)}
-              className="p-2 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 A7 7 0 0 0 21 12.79z" />
-              </svg>
-            </button>
           </div>
 
           {/* Main Content Grid */}
@@ -173,11 +164,11 @@ const Header = () => {
                 {/* Time Display */}
                 <div className="flex items-baseline space-x-2">
                   <div className="flex items-baseline">
-                    <p className={`text-5xl font-bold ${flipHour ? 'animate-hour-flip' : ''} ${darkMode ? 'text-white' : 'text-black'}`}>
+                    <p className={`text-5xl font-bold ${flipHour ? 'animate-hour-flip' : ''} text-white`}>
                       {timeData.time.split(':')[0]}
                     </p>
-                    <span className={`text-4xl mx-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>:</span>
-                    <p className={`text-5xl font-bold ${flipMinute ? 'animate-minute-flip' : ''} ${darkMode ? 'text-white' : 'text-black'}`}>
+                    <span className="text-4xl mx-1 text-gray-400">:</span>
+                    <p className={`text-5xl font-bold ${flipMinute ? 'animate-minute-flip' : ''} text-white`}>
                       {timeData.time.split(':')[1]}
                     </p>
                   </div>
@@ -192,7 +183,7 @@ const Header = () => {
             {/* Current Weather Section */}
             {weatherData?.current && (
               <div className="flex flex-col justify-center">
-                <div className={`text-4xl font-bold mb-2 ${darkMode ? 'text-white' : 'text-black'}`}>
+                <div className="text-4xl font-bold mb-2 text-white">
                   {weatherData.current.temperature_2m}°C
                 </div>
                 <div className="text-lg text-gray-500">
@@ -213,40 +204,34 @@ const Header = () => {
                 label="Temperature"
                 value={`${weatherData.daily.temperature_2m_max[0]}°C`}
                 subValue={`Low: ${weatherData.daily.temperature_2m_min[0]}°C`}
-                darkMode={darkMode}
               />
               <WeatherCard
                 icon={<WiSunrise className="text-3xl" />}
                 label="Sunrise"
                 value={new Date(weatherData.daily.sunrise[0]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                darkMode={darkMode}
               />
               <WeatherCard
                 icon={<WiSunset className="text-3xl" />}
                 label="Sunset"
                 value={new Date(weatherData.daily.sunset[0]).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                darkMode={darkMode}
               />
               <WeatherCard
                 icon={<WiBarometer className="text-3xl" />}
                 label="UV Index"
                 value={weatherData.daily.uv_index_max[0]}
                 subValue={`Rain: ${weatherData.current.precipitation}mm`}
-                darkMode={darkMode}
               />
               <WeatherCard
                 icon={<WiHumidity className="text-3xl" />}
                 label="Precipitation"
                 value={`${weatherData.current.precipitation}mm`}
                 subValue={`Showers: ${weatherData.current.showers}mm`}
-                darkMode={darkMode}
               />
               <WeatherCard
                 icon={<WiStrongWind className="text-3xl" />}
                 label="Timezone"
                 value={weatherData.timezone_abbreviation}
                 subValue={`Elevation: ${weatherData.elevation}m`}
-                darkMode={darkMode}
               />
             </div>
           )}
@@ -256,11 +241,11 @@ const Header = () => {
   );
 };
 
-const WeatherCard = ({ icon, label, value, subValue, darkMode }) => (
-  <div className={`flex flex-col items-center p-3 rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
+const WeatherCard = ({ icon, label, value, subValue }) => (
+  <div className="flex flex-col items-center p-3 rounded-lg bg-gray-700">
     {icon}
-    <span className={`text-sm mt-1 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>{label}</span>
-    <span className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-800'}`}>{value}</span>
+    <span className="text-sm mt-1 text-gray-300">{label}</span>
+    <span className="font-semibold text-white">{value}</span>
     {subValue && <span className="text-xs text-gray-500">{subValue}</span>}
   </div>
 );

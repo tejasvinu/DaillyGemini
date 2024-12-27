@@ -213,10 +213,10 @@ const Dashboard = ({ currentTime, notes, handleAddNote, handleDeleteNote, handle
       <WidgetCard>
         <CalendarEvents />
       </WidgetCard>
-      <WidgetCard className="md:col-span-2 lg:col-span-1">
+      <WidgetCard>
         <MediaPlayer />
       </WidgetCard>
-      <WidgetCard>
+      <WidgetCard className="md:col-span-2 lg:col-span-2">
         <MailsWidget />
       </WidgetCard>
     </div>

@@ -6,6 +6,7 @@ import WebPlayback from './WebPlayback';
 function MediaPlayer() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const token = localStorage.getItem('spotify_access_token');
+  const darkMode = document.documentElement.classList.contains('dark');
 
   useEffect(() => {
     const checkAuth = () => {
@@ -18,18 +19,17 @@ function MediaPlayer() {
 
   if (!isAuthenticated) {
     return (
-      <div className="relative w-full h-full">
-        <div className="absolute bottom-1 right-1">
+      <div className="relative w-full h-full flex items-center justify-center">
+        <div className="absolute bottom-4 right-4">
           <LoginButton />
         </div>
       </div>
     );
   }
 
-  // Simply show the WebPlayback component
   return (
-    <div className="h-full">
-      <WebPlayback token={token} />
+    <div className="w-full h-full">
+      <WebPlayback token={token} darkMode={darkMode} />
     </div>
   );
 }

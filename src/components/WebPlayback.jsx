@@ -178,18 +178,18 @@ function WebPlayback({ token }) {
     );
   } else {
     return (
-      <div className="bg-gradient-to-bl from-black to-purple-900 rounded-xl p-6 shadow-2xl">
-        <div className="flex flex-col space-y-4">
+      <div className="bg-gradient-to-bl from-gray-900 to-blue-800 rounded-xl p-4 sm:p-6 shadow-2xl">
+        <div className="flex flex-col space-y-3 sm:space-y-4">
           {/* Album Art and Track Info */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3 sm:space-x-4">
             <img
               src={current_track.album.images[0].url}
-              className="w-16 h-16 rounded-lg shadow-md"
+              className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg shadow-md"
               alt={current_track.name}
             />
             <div className="flex-1 min-w-0">
-              <h3 className="text-white font-medium truncate">{current_track.name}</h3>
-              <p className="text-gray-300 text-sm truncate">
+              <h3 className="text-white text-sm sm:text-base font-medium truncate">{current_track.name}</h3>
+              <p className="text-gray-300 text-xs sm:text-sm truncate">
                 {current_track.artists.map(artist => artist.name).join(', ')}
               </p>
             </div>
@@ -199,7 +199,7 @@ function WebPlayback({ token }) {
           <div className="flex flex-col space-y-2">
             {/* Progress Bar */}
             <div className="flex items-center space-x-2 text-xs text-gray-300">
-              <span>{formatTime(progressMs)}</span>
+              <span className="hidden sm:inline">{formatTime(progressMs)}</span>
               <div className="flex-1">
                 <input
                   type="range"
@@ -208,76 +208,77 @@ function WebPlayback({ token }) {
                   value={progressMs}
                   onChange={handleSeek}
                   className="w-full h-1 bg-gray-600 rounded-lg appearance-none cursor-pointer
-                           [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3
-                           [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:bg-white
+                           [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-2
+                           [&::-webkit-slider-thumb]:h-2 sm:[&::-webkit-slider-thumb]:w-3
+                           sm:[&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:bg-white
                            [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer"
                 />
               </div>
-              <span>{formatTime(durationMs)}</span>
+              <span className="hidden sm:inline">{formatTime(durationMs)}</span>
             </div>
 
             {/* Control Buttons */}
-            <div className="flex items-center justify-center space-x-4">
+            <div className="flex items-center justify-center space-x-2 sm:space-x-4">
               <button
                 onClick={() => player?.toggleShuffle(!isShuffled)}
-                className={`p-2 rounded-full ${isShuffled ? 'text-green-500' : 'text-white'} hover:bg-white/10`}
+                className={`p-1 sm:p-2 rounded-full ${isShuffled ? 'text-green-500' : 'text-white'} hover:bg-white/10`}
               >
-                <FaShuffle className="w-4 h-4" />
+                <FaShuffle className="w-3 h-3 sm:w-4 sm:h-4" />
               </button>
 
               <button
                 onClick={() => player?.previousTrack()}
-                className="p-2 rounded-full text-white hover:bg-white/10"
+                className="p-1 sm:p-2 rounded-full text-white hover:bg-white/10"
               >
-                <FaStepBackward className="w-5 h-5" />
+                <FaStepBackward className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
 
               <button
                 onClick={() => player?.togglePlay()}
-                className="p-3 rounded-full bg-white text-black hover:scale-105 transition-transform shadow-lg"
+                className="p-2 sm:p-3 rounded-full bg-white text-black hover:scale-105 transition-transform shadow-lg"
               >
-                {is_paused ? <FaPlay className="w-6 h-6" /> : <FaPause className="w-6 h-6" />}
+                {is_paused ? <FaPlay className="w-5 h-5 sm:w-6 sm:h-6" /> : <FaPause className="w-5 h-5 sm:w-6 sm:h-6" />}
               </button>
 
               <button
                 onClick={() => player?.nextTrack()}
-                className="p-2 rounded-full text-white hover:bg-white/10"
+                className="p-1 sm:p-2 rounded-full text-white hover:bg-white/10"
               >
-                <FaStepForward className="w-5 h-5" />
+                <FaStepForward className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
 
               <button
                 onClick={() => player?.toggleRepeat()}
-                className={`p-2 rounded-full ${repeatMode !== 0 ? 'text-green-500' : 'text-white'} hover:bg-white/10`}
+                className={`p-1 sm:p-2 rounded-full ${repeatMode !== 0 ? 'text-green-500' : 'text-white'} hover:bg-white/10`}
               >
-                <FaRedo className="w-4 h-4" />
+                <FaRedo className="w-3 h-3 sm:w-4 sm:h-4" />
               </button>
+
+              <div className="hidden sm:flex items-center space-x-2">
+                <button onClick={handleVolumeClick} className="text-white hover:text-green-500">
+                  {isMuted ? <HiVolumeOff className="w-5 h-5" /> : <HiVolumeUp className="w-5 h-5" />}
+                </button>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={isMuted ? 0 : volume}
+                  onChange={handleVolumeChange}
+                  className="w-20 sm:w-24 h-1 bg-gray-600 rounded-lg appearance-none cursor-pointer
+                         [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-2
+                         [&::-webkit-slider-thumb]:h-2 sm:[&::-webkit-slider-thumb]:w-3
+                         sm:[&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:bg-white
+                         [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer"
+                />
+              </div>
             </div>
           </div>
 
-          {/* Volume Control */}
-          <div className="flex items-center space-x-2">
-            <button onClick={handleVolumeClick} className="text-white hover:text-green-500">
-              {isMuted ? <HiVolumeOff className="w-5 h-5" /> : <HiVolumeUp className="w-5 h-5" />}
-            </button>
-            <input
-              type="range"
-              min="0"
-              max="100"
-              value={isMuted ? 0 : volume}
-              onChange={handleVolumeChange}
-              className="w-24 h-1 bg-gray-600 rounded-lg appearance-none cursor-pointer
-                       [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3
-                       [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:bg-white
-                       [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer"
-            />
-          </div>
-
           {/* Playlist Selection */}
-          <div className="flex space-x-2">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
             <select
               onChange={(e) => handlePlaylistSelect(e.target.value)}
-              className="flex-1 bg-white/10 text-white rounded-lg px-3 py-2 text-sm"
+              className="flex-1 bg-white text-gray-700 border border-gray-200 rounded-lg px-3 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base leading-6 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
             >
               <option value="">Choose Playlist</option>
               {playlists.map(pl => (
@@ -286,9 +287,9 @@ function WebPlayback({ token }) {
             </select>
             <button
               onClick={handleFeelingLucky}
-              className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm"
+              className="px-4 py-2 sm:px-5 sm:py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm sm:text-base font-semibold rounded-lg shadow-md transition duration-150 ease-in-out"
             >
-              Random
+              Feeling Lucky
             </button>
           </div>
         </div>

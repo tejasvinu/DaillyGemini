@@ -4,6 +4,7 @@ import { FiCalendar, FiRefreshCw, FiX } from 'react-icons/fi';
 import { FcGoogle } from 'react-icons/fc';
 import { calendarService } from '../services/CalendarService';
 import Modal from './Modal';
+import { LoadingSpinner } from './Spinner';
 
 function EventDetailsModal({ event, onClose }) {
   if (!event) return null;
@@ -116,8 +117,8 @@ function CalendarEvents() {
           </button>
         </div>
       ) : isLoading ? (
-        <div className="flex justify-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+        <div className="flex justify-center items-center p-12">
+          <LoadingSpinner label="Getting your Events..." />
         </div>
       ) : (
         <ul className="space-y-2">
